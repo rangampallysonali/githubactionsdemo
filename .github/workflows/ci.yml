@@ -6,16 +6,16 @@ jobs:
   runs-on: ubuntu-latest
 
   steps:
-    -name: checkout repository
-     uses: actions/checkout@v4
+      -name: checkout repository
+       uses: actions/checkout@v4
     
-    -name: set up python
-     uses: actions/setup-python@v5
-     with:
-       python-version: "3.11"
+      -name: set up python
+       uses: actions/setup-python@v5
+       with:
+         python-version: "3.11"
     
-    -name: install dependencies
-     run: pip install -r requirements.txt
+      -name: install dependencies
+       run: pip install -r requirements.txt
 
-    -name: Run tests
-     run: pytest
+      -name: Run tests
+       run: pytest
