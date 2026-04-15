@@ -1,22 +1,24 @@
 from flask import Flask, request, jsonify
 from pymongo import MongoClient
+import os
 
 app = Flask(__name__)
 
-client = MongoClient("mongodb://mongodb:27017/")
+mongo_uri = os.getenv("MONGO_URI", "mongodb://localhost:27017/")
+client = MongoClient(mongo_uri)
 db = client["library"]
 books = db["books"]
 
 @app.route("/")
 def home():
-    return "Book API is running"
+    return "Book API is running", 200
 
 @app.route("/books", methods=["GET"])
 def get_books():
     all_books = []
     for book in books.find({}, {"_id": 0}):
         all_books.append(book)
-    return jsonify(all_books)
+    return jsonify(all_books), 200
 
 @app.route("/books", methods=["POST"])
 def add_book():
@@ -28,16 +30,10 @@ def add_book():
         "author": data["author"]
     }
 
-    result = books.insert_one(book)
+    books.insert_one(book)
 
     return jsonify({
-        "message": "Book added",
-        "book": {
-            "id": book["id"],
-            "title": book["title"],
-            "author": book["author"]
-        },
-        "mongo_id": str(result.inserted_id)
+        "message": "Book added"
     }), 200
 
 @app.route("/books/<int:book_id>", methods=["DELETE"])
@@ -47,7 +43,7 @@ def delete_book(book_id):
     if result.deleted_count == 0:
         return jsonify({"message": "Book not found"}), 404
 
-    return jsonify({"message": "Book deleted"})
+    return jsonify({"message": "Book deleted"}), 200
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=4000)
